@@ -5,7 +5,7 @@ declare +x host="${1:-127.0.0.1}"
 declare +x port="${2:-6600}"
 declare +x password
 
-read -rp 'Password: ' password || exit 1
+read -rsp 'Password: ' password || exit 1
 
 exec 42<>"/dev/tcp/$host/$port"
 declare +x -A result
@@ -18,6 +18,12 @@ main()
         send-and-wait "password $password"
         echo Authenticated
     }
+
+    while true; do
+        send-and-wait "currentsong"
+        echo "Now playing: ${result[file:]}"
+        send-and-wait "idle mixer"
+    done
 }
 
 wait-result()
@@ -27,6 +33,7 @@ wait-result()
     result=()
     while read -r key value; do
         result["$key"]="$value"
+        printf "[%s] = [%s]\n" "$key" "$value"
         [[ "$key" == "OK" ]] && return
         [[ "$key" == "ACK" ]] && {
             printf "Failure: %s\n" "$value"
@@ -37,6 +44,7 @@ wait-result()
 
 send-and-wait()
 {
+    printf "%s %s\n" "-- SEND --" "$*"
     echo "$*" >&42
     wait-result
 }
