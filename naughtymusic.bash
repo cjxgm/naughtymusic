@@ -22,6 +22,7 @@ main()
     while true; do
         send-and-wait "currentsong"
         echo "Now playing: ${result[file:]}"
+        notify "Playing" "${result[file:]}"
         send-and-wait "idle mixer"
     done
 }
@@ -47,6 +48,15 @@ send-and-wait()
     printf "%s %s\n" "-- SEND --" "$*" >&2
     echo "$*" >&42
     wait-result
+}
+
+declare +x notify_id=""
+notify()
+{
+    declare +x -a args=()
+    [[ -z "$notify_id" ]] || args+=(-r "$notify_id")
+    echo notify-send "${args[@]}" -p "$@" >&2
+    notify_id="$(notify-send "${args[@]}" -p "$@")"
 }
 
 main "$@"
