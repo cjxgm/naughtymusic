@@ -33,7 +33,7 @@ wait-result()
     result=()
     while read -r key value; do
         result["$key"]="$value"
-        printf "[%s] = [%s]\n" "$key" "$value"
+        printf "[%s] = [%s]\n" "$key" "$value" >&2
         [[ "$key" == "OK" ]] && return
         [[ "$key" == "ACK" ]] && {
             printf "Failure: %s\n" "$value"
@@ -44,7 +44,7 @@ wait-result()
 
 send-and-wait()
 {
-    printf "%s %s\n" "-- SEND --" "$*"
+    printf "%s %s\n" "-- SEND --" "$*" >&2
     echo "$*" >&42
     wait-result
 }
