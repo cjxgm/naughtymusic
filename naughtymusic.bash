@@ -23,7 +23,7 @@ main()
         send-and-wait "currentsong"
         echo "Now playing: ${result[file:]}"
         notify "Playing" "${result[file:]}"
-        send-and-wait "idle mixer"
+        send-and-wait "idle"
     done
 }
 
